@@ -1,0 +1,5 @@
+name "profiled"
+description "A simple intrusive profiler that exports to perfetto."
+authors "Christian Koestlin"
+copyright "Copyright (c) 2022, Christian Koestlin"
+license "MIT"
