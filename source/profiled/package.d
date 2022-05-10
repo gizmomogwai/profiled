@@ -23,28 +23,6 @@ string tid2string(Tid id)
         .to!string;
 }
 
-enum Phase
-{
-    BEGIN, END
-}
-class DurationEvent : Event
-{
-    Phase phase;
-    string name;
-    Tid threadId;
-    MonoTime timestamp;
-    this(Phase phase, string name, Tid threadId, MonoTime timestamp)
-    {
-        this.phase = phase;
-        this.name = name;
-        this.threadId = threadId;
-        this.timestamp = timestamp;
-    }
-    override public string toJson()
-    {
-        return `{"name":"%s", "cat": "category", "ph": "%s", "ts": %s, "pid":1, "tid": %s}`.format(name, (phase == Phase.BEGIN ? "B" : "E"), convClockFreq(timestamp.ticks, MonoTime.ticksPerSecond, 1_000_000), tid2string(threadId));
-    }
-}
 class CompleteEvent : Event
 {
     string name;
@@ -63,21 +41,6 @@ class CompleteEvent : Event
         return `{"name":"%s","cat":"category","ph":"X","ts":%s,"dur":%s, "pid":1, "tid":%s}`.format(name, convClockFreq(start.ticks, MonoTime.ticksPerSecond, 1_000_000).to!string, duration.total!("usecs"), tid2string(threadId));
     }
 }
-class DurationEventProcess
-{
-    Profiler profiler;
-    string name;
-
-    this(Profiler profiler, string name)
-    {
-        this.profiler = profiler;
-        this.name = name;
-    }
-    void finish()
-    {
-        profiler.add(new DurationEvent(Phase.END, name, thisTid, MonoTime.currTime));
-    }
-}
 class CompleteEventProcess
 {
     Profiler profiler;
@@ -91,7 +54,7 @@ class CompleteEventProcess
         this.tid = tid;
         this.start = start;
     }
-    void finish()
+    ~this()
     {
         profiler.add(new CompleteEvent(name, tid, start, MonoTime.currTime - start));
     }
@@ -104,16 +67,10 @@ class Profiler
     {
         eventsMutex = new Mutex();
     }
-    public CompleteEventProcess startComplete(string name)
+    public Unique!CompleteEventProcess start(string name)
     {
-        return new CompleteEventProcess(this, name, thisTid, MonoTime.currTime);
-    }
-    public DurationEventProcess start(string theName)
-    {
-        eventsMutex.lock();
-        scope (exit) eventsMutex.unlock;
-        events ~= new DurationEvent(Phase.BEGIN, theName, thisTid, MonoTime.currTime);
-        return new DurationEventProcess(this, theName);
+        Unique!CompleteEventProcess result = new CompleteEventProcess(this, name, thisTid, MonoTime.currTime);
+        return result;
     }
     public void add(Event e) {
         eventsMutex.lock;
