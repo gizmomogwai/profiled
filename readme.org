@@ -1,0 +1,13 @@
+* Profiled
+
+Profile dlang apps with [[https://ui.perfetto.dev][perfetto]].
+Implements the json [[https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/edit#heading=h.lpfof2aylapb][Trace Event Format]] usable with perfetto.
+
+** Usage
+- initialize =theProfiler= global variable
+- augment your code with calls to =theProfiler.start= :)
+
+** Screenshot
+#+CAPTION: Example perfetto view
+#+NAME: trace
+[[./screenshots/trace.png]]
