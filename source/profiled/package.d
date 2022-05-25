@@ -10,6 +10,7 @@ abstract class Event
     public abstract string toJson();
 }
 
+// TODO
 string tid2string(Tid id)
 {
     import std.conv : text;
@@ -100,6 +101,9 @@ class Profiler
         auto f = File(filename, "w");
         f.writeln("[");
         bool first = true;
+        eventsMutex.lock;
+        scope(exit)
+            eventsMutex.unlock;
         foreach (e; events[])
         {
             if (first)
