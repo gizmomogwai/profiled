@@ -1,6 +1,5 @@
 module profiled;
 
-import std.concurrency;
 import core.sync.mutex;
 import std;
 
