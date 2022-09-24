@@ -3,7 +3,9 @@ module profiled;
 import core.sync.mutex;
 import std;
 
-__gshared Profiler theProfiler;
+private:
+
+public __gshared Profiler theProfiler;
 
 abstract class Event
 {
@@ -72,7 +74,7 @@ class CompleteEventProcess
     }
 }
 
-class Profiler
+public class Profiler
 {
     Mutex eventsMutex;
     Appender!(Event[]) events = appender!(Event[]);
@@ -116,5 +118,16 @@ class Profiler
             }
             f.write(e.toJson());
         }
+    }
+}
+
+public class NoopProfiler : Profiler
+{
+    override public void add(Event e)
+    {
+    }
+
+    override public void dumpJson(string filename)
+    {
     }
 }
