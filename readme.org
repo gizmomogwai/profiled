@@ -5,7 +5,11 @@ Implements the json [[https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OO
 
 ** Usage
 - initialize =theProfiler= global variable
-- augment your code with calls to =theProfiler.start= :)
+- augment your code with calls to =auto profileEvent = theProfiler.start=.
+  The profetto event will last as long as profileEvent stays in the
+  scope. Adding the event is threadsafe.
+- Dump json at the end of the program or whenever you are interested
+  with =theProfiler.dumpJson=.
 
 ** Screenshot
 #+CAPTION: Example perfetto view
